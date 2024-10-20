@@ -20,7 +20,6 @@ setup(
         'ofa>=0.1.0.post202307202001',
         'torchvision>=0.17.2',
         'transformers>= 4.45.2',
-        '<dependency_name> @ git+ssh://git@github.com/<user>/<repo_name>@<branch>',
         # Public repository
         '<dependency_name> @ git+https://github.com/gslama12/GaLore',
     ],
