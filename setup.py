@@ -18,7 +18,7 @@ setup(
         'peft>=0.12.0',
         'ofa>=0.1.0.post202307202001',
         'torchvision>=0.17.2',
-        'git+https://github.com/gslama12/GaLore',
+        'git+https://github.com/gslama12/GaLore.git',
         'transformers>= 4.45.2',
         # Add other dependencies here
     ],
