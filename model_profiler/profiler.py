@@ -1,5 +1,4 @@
-from profilers.flops_profiler import FlopCounterMode
-from profilers.memory_profiler import profile_memory_cost
+from profilers import flops_profiler, memory_profiler
 from tabulate import tabulate
 import warnings
 from transformers.modeling_outputs import ImageClassifierOutputWithNoAttention
@@ -20,7 +19,7 @@ class Profiler:
 
         # 1.) profile flops
         print("\n - - - - - - - - - - - - - - FLOPs - - - - - - - - - - - - - -")
-        flop_counter = FlopCounterMode(self.model, print_flops_per_layer=self.flops_per_layer)
+        flop_counter = flops_profiler.FlopCounterMode(self.model, print_flops_per_layer=self.flops_per_layer)
 
         if self.optimizer:
             with flop_counter:
@@ -51,7 +50,7 @@ class Profiler:
 
         # 2.) profile memory
         print("\n - - - - - - - - - - - - - - MEMORY - - - - - - - - - - - - - -")
-        memory_cost, detailed_info = profile_memory_cost(
+        memory_cost, detailed_info = memory_profiler.profile_memory_cost(
                 self.model,
                 self.optimizer,
                 input_tensor.size(),
