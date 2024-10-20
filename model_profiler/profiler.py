@@ -1,6 +1,6 @@
 from profilers import flops_profiler, memory_profiler
 from tabulate import tabulate
-import warnings
+import warningss
 from transformers.modeling_outputs import ImageClassifierOutputWithNoAttention
 
 
