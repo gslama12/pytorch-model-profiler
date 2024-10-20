@@ -10,6 +10,7 @@ import torch
 from torch.utils._pytree import tree_map
 from typing import List, Any
 from numbers import Number
+from tabulate import tabulate
 from collections import defaultdict
 from torch.utils._python_dispatch import TorchDispatchMode
 from peft import PeftModel
@@ -176,9 +177,10 @@ def normalize_tuple(x):
 
 
 class FlopCounterMode(TorchDispatchMode):
-    def __init__(self, model = None):
+    def __init__(self, model = None, print_flops_per_layer=False):
         self.flop_counts = defaultdict(lambda: defaultdict(int))
         self.parents = ['Global']
+        self.print_flops_per_layer = print_flops_per_layer
         if model is not None:
             if isinstance(model, PeftModel):
                 module_dict = dict(model.base_model.model.named_children()).items()
@@ -244,15 +246,30 @@ class FlopCounterMode(TorchDispatchMode):
         super().__enter__()
 
     def __exit__(self, *args):
-        gflops = round(sum(self.flop_counts['Global'].values())/1e9, 10)
-        print(f"Total: {gflops} GFlops")
-        for mod in self.flop_counts.keys():
-            print(f"Module: ", mod)
-            for k,v in self.flop_counts[mod].items():
-                mod_gflops = round(v/1e9, 10)
-                print(f"{k}: {mod_gflops} GFLOPS")
-            print()
-        super().__exit__(*args)
+        # print global flops
+        table_data = []
+        for k, v in self.flop_counts['Global'].items():
+            mod_flops = round(v)
+            table_data.append([str(k), f"{mod_flops:,} FLOPs"])
+        flops_total = round(sum(self.flop_counts['Global'].values()))
+        table_data.append(["TOTAL", f"{flops_total:,} FLOPs"])
+        table_headers = ["Global", "FLOPs"]
+        print(tabulate(table_data, table_headers, stralign="right", colalign=("center", "center")))
+        print()
+
+        # print flops per layer
+        if self.print_flops_per_layer:
+            for mod in self.flop_counts.keys():
+                if mod != 'Global':
+                    table_data = []
+                    for k,v in self.flop_counts[mod].items():
+                        mod_flops = round(v)
+                        table_data.append([str(k), f"{mod_flops:,} FLOPs"])
+                    flops_total = round(sum(self.flop_counts[mod].values()))
+                    table_data.append(["TOTAL", f"{flops_total:,} FLOPs"])
+                    table_headers = [mod, "FLOPs"]
+                    print(tabulate(table_data, table_headers, stralign="right", colalign=("center", "center")))
+                    print()
 
     def __torch_dispatch__(self, func, types, args=(), kwargs=None):
         kwargs = kwargs if kwargs else {}

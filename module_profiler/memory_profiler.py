@@ -15,14 +15,13 @@ from ofa.utils import Hswish, Hsigmoid, MyConv2d
 from ofa.utils.layers import ResidualBlock
 from torchvision.models.resnet import BasicBlock, Bottleneck
 from torchvision.models.mobilenetv2 import InvertedResidual
-from galore_torch import GaLoreAdamW
+from galore_torch import GaLoreAdamW #TODO
 
 __all__ = ['count_model_size', 'count_activation_size', 'profile_memory_cost']
 
 
 def count_model_size(net, trainable_param_bits=32, frozen_param_bits=8, print_log=True):
     total_params = sum(p.numel() for p in net.parameters() if p.requires_grad)
-    print(f'Total number of trainable parameters: {total_params}')
 
     frozen_param_bits = 32 if frozen_param_bits is None else frozen_param_bits
 
@@ -35,9 +34,13 @@ def count_model_size(net, trainable_param_bits=32, frozen_param_bits=8, print_lo
             frozen_param_size += frozen_param_bits / 8 * p.numel()
     model_size = trainable_param_size + frozen_param_size
     if print_log:
-        print('Total Model Size: %d' % model_size,
-              '\tTrainable Parameters Size: %d (data bits %d)' % (trainable_param_size, trainable_param_bits),
-              '\tFrozen Parameters Size: %d (data bits %d)' % (frozen_param_size, frozen_param_bits))
+        print('MODEL SUMMARY:',
+              f'\n\tTrainable parameters: {total_params:,}'
+              f'\n\tModel Size: {round(model_size):,} Byte',
+              f'\n\tTrainable Parameters Size: {round(trainable_param_size):,} Byte ({trainable_param_bits} bit per param)',
+              f'\n\tFrozen Parameters Size: {round(frozen_param_size):,} Byte ({frozen_param_bits} bit per param)')
+        print()
+
     # Byte
     return model_size
 
@@ -208,3 +211,6 @@ def profile_memory_cost(net, optimizer, input_size=(1, 3, 224, 224), require_bac
     activation_size, _ = count_activation_size(net, optimizer, input_size, require_backward, activation_bits)
     memory_cost = activation_size * batch_size + param_size
     return memory_cost, {'param_size': param_size, 'act_size': activation_size}
+
+def format_number(number):
+    return "{:,}".format(number)
