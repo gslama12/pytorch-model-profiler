@@ -1,4 +1,4 @@
-from module_profiler import Profiler
+from model_profiler import Profiler
 import torch
 import torchvision
 
