@@ -15,7 +15,7 @@ from ofa.utils import Hswish, Hsigmoid, MyConv2d
 from ofa.utils.layers import ResidualBlock
 from torchvision.models.resnet import BasicBlock, Bottleneck
 from torchvision.models.mobilenetv2 import InvertedResidual
-from galore_torch import GaLoreAdamW #TODO
+from galore_torch import GaLoreAdamW, GaLoreAdamW8bit, GaLoreAdafactor #TODO:
 
 __all__ = ['count_model_size', 'count_activation_size', 'profile_memory_cost']
 
@@ -48,7 +48,7 @@ def count_model_size(net, trainable_param_bits=32, frozen_param_bits=8, print_lo
 def count_activation_size(net, optimizer, input_size=(1, 3, 224, 224), require_backward=True, activation_bits=32):
     use_galore = False
     galore_rank = None
-    if isinstance(optimizer, GaLoreAdamW):
+    if isinstance(optimizer, (GaLoreAdamW, GaLoreAdamW8bit, GaLoreAdafactor)):
         use_galore = True
         galore_rank = optimizer.param_groups[1]['rank']
 
@@ -113,7 +113,7 @@ def count_activation_size(net, optimizer, input_size=(1, 3, 224, 224), require_b
         # temporary memory footprint required by inference
         m.tmp_activations = torch.Tensor([x[0].numel() * act_byte])  # bytes
 
-    def count_smooth_act(m, x, _):  # not used for MobileNet
+    def count_smooth_act(m, x, _):
         # count activation size required by backward
         if require_backward:
             if use_galore:

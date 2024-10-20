@@ -143,16 +143,19 @@ def conv_backward_flop(inputs: List[Any], outputs: List[Any]):
         grad_weight_shape = get_shape(outputs[1])
         flop_count += conv_flop_count(transpose_shape(x_shape), grad_out_shape, grad_weight_shape, fwd_transposed)
 
-    if output_mask[2]:  # if compute bias gradients = true (SKIPPED)
-        pass
+    if output_mask[2]:  # compute bias gradients = true (SKIPPED)
+        pass  # TODO: can i add this too?
 
     return flop_count
+
 
 def add_flops(inputs: List[Any], outputs: List[Any]) -> Number:
     return inputs[0].numel() * 2  #add always has does c = a + scaling_factor * b
 
+
 def mul_flops(inputs: List[Any], outputs: List[Any]) -> Number:
     return outputs[0].numel()
+
 
 flop_mapping = {
     aten.mm: matmul_flop,
@@ -186,7 +189,7 @@ class FlopCounterMode(TorchDispatchMode):
                 module_dict = dict(model.base_model.model.named_children()).items()
             else:
                 module_dict = dict(model.named_children()).items()
-
+            # here the hooks are registered. this can be adapted to achieve finer-grained profiling results.
             for name, module in module_dict:
                 module.register_forward_pre_hook(self.enter_module(name))
                 module.register_forward_hook(self.exit_module(name))
@@ -284,4 +287,5 @@ class FlopCounterMode(TorchDispatchMode):
         return out
 
     def reset_module_tracking_before_optimizer_step(self):
+        # reset the module tracking to capture flops during the optimizer.step()
         self.parents = ['Global', 'optimizer']

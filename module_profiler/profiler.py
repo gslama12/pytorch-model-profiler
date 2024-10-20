@@ -8,7 +8,7 @@ from transformers.modeling_outputs import ImageClassifierOutputWithNoAttention
 class Profiler:
     def __init__(self, model, optimizer=None, results_dir=None, flops_per_layer=False,
                  activation_bits=32, trainable_param_bits=32, frozen_param_bits=8):
-        self.model = model
+        self.model = model.train()
         self.optimizer = optimizer
         self.results_dir = results_dir
         self.flops_per_layer = flops_per_layer
