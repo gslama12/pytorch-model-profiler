@@ -11,7 +11,6 @@ setup(
     url='https://github.com/gslama12/pytorch-model-profiler',
     packages=find_packages(),
     install_requires=[
-        '<normal_dependency>',
         'setuptools>=68.2.0',
         'tabulate>=0.9.0',
         'torch>=2.2.2',
