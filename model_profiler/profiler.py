@@ -1,5 +1,5 @@
-from .flops_profiler import FlopCounterMode
-from .memory_profiler import profile_memory_cost
+from profilers.flops_profiler import FlopCounterMode
+from profilers.memory_profiler import profile_memory_cost
 from tabulate import tabulate
 import warnings
 from transformers.modeling_outputs import ImageClassifierOutputWithNoAttention
