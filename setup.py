@@ -11,6 +11,7 @@ setup(
     url='https://github.com/gslama12/pytorch-model-profiler',
     packages=find_packages(),
     install_requires=[
+        '<normal_dependency>',
         'setuptools>=68.2.0',
         'tabulate>=0.9.0',
         'torch>=2.2.2',
@@ -18,9 +19,10 @@ setup(
         'peft>=0.12.0',
         'ofa>=0.1.0.post202307202001',
         'torchvision>=0.17.2',
-        'git+https://github.com/gslama12/GaLore.git',
         'transformers>= 4.45.2',
-        # Add other dependencies here
+        '<dependency_name> @ git+ssh://git@github.com/<user>/<repo_name>@<branch>',
+        # Public repository
+        '<dependency_name> @ git+https://github.com/gslama12/GaLore',
     ],
     classifiers=[
         'Programming Language :: Python :: 3',
