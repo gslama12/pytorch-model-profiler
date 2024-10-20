@@ -10,8 +10,16 @@ setup(
     long_description_content_type='text/markdown',
     url='https://github.com/gslama12/pytorch-model-profiler',
     packages=find_packages(),
-    install_requires=[                           # TODO: Add Dependencies
-        'torch>=1.0.0',                          # TODO: Specify PyTorch version
+    install_requires=[
+        'setuptools>=68.2.0',
+        'tabulate>=0.9.0',
+        'torch>=2.2.2',
+        'tabulate>=0.9.0',
+        'peft>=0.12.0',
+        'ofa>=0.1.0.post202307202001',
+        'torchvision>=0.17.2',
+        'git+https://github.com/gslama12/GaLore',
+        'transformers>= 4.45.2',
         # Add other dependencies here
     ],
     classifiers=[
