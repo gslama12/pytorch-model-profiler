@@ -21,7 +21,7 @@ setup(
         'torchvision>=0.17.2',
         'transformers>= 4.45.2',
         # Public repository
-        '<dependency_name> @ git+https://github.com/gslama12/GaLore',
+        'galore_torch @ git+https://github.com/gslama12/GaLore',
     ],
     classifiers=[
         'Programming Language :: Python :: 3',
