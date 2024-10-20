@@ -29,9 +29,9 @@ import torch
 from module_profiler import Profiler
 
 resnet = torch.hub.load('pytorch/vision:v0.10.0', 'resnet18')
-optimizer = torch.optim.SGD(params=resnet.parameters()) # optimizer is optional
+optimizer = torch.optim.SGD(params=resnet.parameters())  # optimizer is optional
 p = Profiler(resnet, optimizer=optimizer, flops_per_layer=True)
-p.profile(torch.rand(1, 3, 244, 244)) #speify model input
+p.profile(torch.rand(1, 3, 244, 244))  #specify model input
 ```
 
 **Tested Models:**
