@@ -6,8 +6,8 @@ import torchvision
 model = torch.hub.load('pytorch/vision:v0.10.0', 'resnet18', pretrained=False)
 #model = torchvision.models.mobilenet_v3_large()
 #model = torch.hub.load('pytorch/vision:v0.10.0', 'googlenet', pretrained=False)
-#model = torch.hub.load('pytorch/vision:v0.10.0', 'alexnet', pretrained=False) #TODO: flops per layers
-#model = torch.hub.load('pytorch/vision:v0.10.0', 'vgg11', pretrained=False) #TODO: flops per layers
+#model = torch.hub.load('pytorch/vision:v0.10.0', 'alexnet', pretrained=False)
+#model = torch.hub.load('pytorch/vision:v0.10.0', 'vgg11', pretrained=False)
 
 optimizer = torch.optim.SGD(params=model.parameters())
 
