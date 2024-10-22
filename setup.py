@@ -9,7 +9,7 @@ setup(
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
     url='https://github.com/gslama12/pytorch-model-profiler',
-    packages=["model_profiler/profilers"],
+    packages=["model_profiler", "model_profiler/profilers"],
     install_requires=[
         'setuptools>=68.2.0',
         'tabulate>=0.9.0',
