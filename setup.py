@@ -19,8 +19,7 @@ setup(
         'ofa>=0.1.0.post202307202001',
         'torchvision>=0.17.2',
         'transformers>= 4.45.2',
-        # Public repository
-        'galore_torch @ git+https://github.com/gslama12/GaLore',
+        'galore_torch=1.0',
     ],
     classifiers=[
         'Programming Language :: Python :: 3',
