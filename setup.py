@@ -1,4 +1,4 @@
-from setuptools import setup, find_packages
+from setuptools import setup
 
 setup(
     name='model_profiler',
@@ -9,7 +9,7 @@ setup(
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
     url='https://github.com/gslama12/pytorch-model-profiler',
-    packages=find_packages(),
+    packages=["profilers"],
     install_requires=[
         'setuptools>=68.2.0',
         'tabulate>=0.9.0',
@@ -27,5 +27,5 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
     ],
-    python_requires='>=3.11',                     # Minimum Python version
+    python_requires='>=3.11',
 )

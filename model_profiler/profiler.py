@@ -26,21 +26,21 @@ class Profiler:
                 self.optimizer.zero_grad()
                 outputs = self.model(input_tensor)
 
-                if isinstance(outputs, tuple): #TODO
+                if isinstance(outputs, tuple):
                     outputs = outputs[0]
                 if isinstance(outputs, ImageClassifierOutputWithNoAttention):
                     outputs = outputs.logits
 
                 loss = outputs.sum()
                 loss.backward()
-                flop_counter.reset_module_tracking_before_optimizer_step() #TODO: print this too
+                flop_counter.reset_module_tracking_before_optimizer_step()
                 self.optimizer.step()
         else:
             warnings.warn("Optimizer not specified, profiling without optimizer.step().", UserWarning)
             with flop_counter:
                 outputs = self.model(input_tensor)
 
-                if isinstance(outputs, tuple): #TODO
+                if isinstance(outputs, tuple):
                     outputs = outputs[0]
                 if isinstance(outputs, ImageClassifierOutputWithNoAttention):
                     outputs = outputs.logits

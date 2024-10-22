@@ -26,7 +26,7 @@ pip install git+https://github.com/gslama12/pytorch-model-profiler
 ### Example
 ```
 import torch
-from module_profiler import Profiler
+from model_profiler import Profiler
 
 resnet = torch.hub.load('pytorch/vision:v0.10.0', 'resnet18')
 optimizer = torch.optim.SGD(params=resnet.parameters())  # optimizer is optional
