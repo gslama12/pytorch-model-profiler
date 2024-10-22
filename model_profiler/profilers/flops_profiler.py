@@ -143,8 +143,8 @@ def conv_backward_flop(inputs: List[Any], outputs: List[Any]):
         grad_weight_shape = get_shape(outputs[1])
         flop_count += conv_flop_count(transpose_shape(x_shape), grad_out_shape, grad_weight_shape, fwd_transposed)
 
-    if output_mask[2]:  # compute bias gradients = true (SKIPPED)
-        pass  # TODO: can i add this too?
+    if output_mask[2]:  # compute bias gradients = true
+        pass  # TODO: bias gradient is not supported yet
 
     return flop_count
 

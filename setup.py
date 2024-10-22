@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='model_profiler',
-    version='0.1',
+    version='1.0',
     author='Georg Slamanig',
     author_email='georgslamanig@gmail.com',
     description='A simple FLOPs and memory profiler for pytorch models',

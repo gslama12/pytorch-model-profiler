@@ -5,11 +5,10 @@ from transformers.modeling_outputs import ImageClassifierOutputWithNoAttention
 
 
 class Profiler:
-    def __init__(self, model, optimizer=None, results_dir=None, flops_per_layer=False,
+    def __init__(self, model, optimizer=None, flops_per_layer=False,
                  activation_bits=32, trainable_param_bits=32, frozen_param_bits=8):
         self.model = model.train()
         self.optimizer = optimizer
-        self.results_dir = results_dir
         self.flops_per_layer = flops_per_layer
         self.activation_bits = activation_bits
         self.trainable_param_bits = trainable_param_bits
@@ -65,6 +64,3 @@ class Profiler:
         table_data.append(["TOTAL MEMORY COST", f" {round(memory_cost):,} B"])
         table_headers = ["Source", "Memory"]
         print(tabulate(table_data, table_headers, stralign="right", colalign=("center", "center")))
-
-        if self.results_dir:
-            pass  #TODO

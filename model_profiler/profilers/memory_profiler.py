@@ -15,7 +15,7 @@ from ofa.utils import Hswish, Hsigmoid, MyConv2d
 from ofa.utils.layers import ResidualBlock
 from torchvision.models.resnet import BasicBlock, Bottleneck
 from torchvision.models.mobilenetv2 import InvertedResidual
-from galore_torch import GaLoreAdamW, GaLoreAdamW8bit, GaLoreAdafactor #TODO:
+from galore_torch import GaLoreAdamW, GaLoreAdamW8bit, GaLoreAdafactor
 
 __all__ = ['count_model_size', 'count_activation_size', 'profile_memory_cost']
 
