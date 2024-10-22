@@ -19,7 +19,7 @@ setup(
         'ofa>=0.1.0.post202307202001',
         'torchvision>=0.17.2',
         'transformers>= 4.45.2',
-        'galore_torch=1.0',
+        'galore_torch>=1.0',
     ],
     classifiers=[
         'Programming Language :: Python :: 3',
