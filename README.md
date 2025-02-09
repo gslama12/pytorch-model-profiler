@@ -57,12 +57,10 @@ The memory profiler part should work for **all** PyTorch Models, not just for th
   - OTH: memory that does not belong to any of the other categories.
 
 **Tested Models:**
-- MobileNetV1
 - MobileNetV2
 - MobileNetV3
 - ResNet
 - WideResNet
-- GoogLeNet
 - AlexNet
 - VGG-Nets
 
