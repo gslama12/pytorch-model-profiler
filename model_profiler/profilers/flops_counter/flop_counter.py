@@ -10,11 +10,11 @@ import torch
 from torch.utils._pytree import tree_map
 from typing import List, Any
 from numbers import Number
-from tabulate import tabulate
 from collections import defaultdict
 from torch.utils._python_dispatch import TorchDispatchMode
 from peft import PeftModel
-
+from torch.nn import ModuleList
+from tabulate import tabulate
 
 aten = torch.ops.aten
 
@@ -143,18 +143,61 @@ def conv_backward_flop(inputs: List[Any], outputs: List[Any]):
         grad_weight_shape = get_shape(outputs[1])
         flop_count += conv_flop_count(transpose_shape(x_shape), grad_out_shape, grad_weight_shape, fwd_transposed)
 
-    if output_mask[2]:  # compute bias gradients = true
-        pass  # TODO: bias gradient is not supported yet
+    if output_mask[2]:  # if compute bias gradient (SKIPPED)
+        pass
 
     return flop_count
-
 
 def add_flops(inputs: List[Any], outputs: List[Any]) -> Number:
     return inputs[0].numel() * 2  #add always has does c = a + scaling_factor * b
 
-
 def mul_flops(inputs: List[Any], outputs: List[Any]) -> Number:
     return outputs[0].numel()
+
+def bn_flops(inputs: List[Any], outputs: List[Any]) -> Number:
+    x = inputs[0]
+    shift = inputs[1]
+    scale = inputs[2]
+
+    batch_size = x.shape[0]
+    num_ch_in = x.shape[1]
+    in_height = x.shape[2]
+    in_width = x.shape[3]
+
+    flops = 0
+    flops += batch_size * num_ch_in * in_height * in_width + num_ch_in  # mean computation
+    flops += 2 * batch_size * num_ch_in * in_height * in_width + num_ch_in  # var computation
+    flops += 3 * batch_size * num_ch_in * in_height * in_width  # normalization
+
+    if shift.requires_grad:
+        flops += batch_size * num_ch_in * in_height * in_width
+
+    if scale.requires_grad:
+        flops += batch_size * num_ch_in * in_height * in_width
+
+    return flops
+
+def bn_bwd_flops(inputs: List[Any], outputs: List[Any]) -> Number:
+    # also see: https://kevinzakka.github.io/2016/09/14/batch_normalization/
+    x = inputs[0]
+    shift = inputs[2]
+    scale = inputs[3]
+
+    batch_size = x.shape[0]
+    num_ch_in = x.shape[1]
+    in_height = x.shape[2]
+    in_width = x.shape[3]
+    flops = 0
+
+    flops += 4 * batch_size * num_ch_in * in_height * in_width + num_ch_in
+
+    if shift.requires_grad:
+        flops += batch_size * num_ch_in * in_height * in_width + num_ch_in
+
+    if scale.requires_grad:
+        flops += 2 * batch_size * num_ch_in * in_height * in_width + num_ch_in - num_ch_in
+
+    return flops
 
 
 flop_mapping = {
@@ -170,6 +213,9 @@ flop_mapping = {
     aten.add_: add_flops,
     aten.mul: mul_flops,
     aten.mul_: mul_flops,
+    aten.native_batch_norm: bn_flops,
+    aten.batch_norm: bn_flops,
+    aten.native_batch_norm_backward: bn_bwd_flops
 }
 
 
@@ -189,10 +235,15 @@ class FlopCounterMode(TorchDispatchMode):
                 module_dict = dict(model.base_model.model.named_children()).items()
             else:
                 module_dict = dict(model.named_children()).items()
-            # here the hooks are registered. this can be adapted to achieve finer-grained profiling results.
+
             for name, module in module_dict:
-                module.register_forward_pre_hook(self.enter_module(name))
-                module.register_forward_hook(self.exit_module(name))
+                if isinstance(module, ModuleList):
+                    for i, mod in enumerate(module):
+                        mod.register_forward_pre_hook(self.enter_module(name + "." + str(i) + ".conv2"))
+                        mod.register_forward_hook(self.exit_module(name + "." + str(i) + ".conv2"))
+                else:
+                    module.register_forward_pre_hook(self.enter_module(name))
+                    module.register_forward_hook(self.exit_module(name))
 
     def enter_module(self, name):
         def f(module, inputs):
@@ -257,7 +308,7 @@ class FlopCounterMode(TorchDispatchMode):
         flops_total = round(sum(self.flop_counts['Global'].values()))
         table_data.append(["TOTAL", f"{flops_total:,} FLOPs"])
         table_headers = ["Global", "FLOPs"]
-        print(tabulate(table_data, table_headers, stralign="right", colalign=("center", "center")))
+        print(tabulate(table_data, table_headers, stralign="right", colalign=("right", "right")))
         print()
 
         # print flops per layer
@@ -265,14 +316,16 @@ class FlopCounterMode(TorchDispatchMode):
             for mod in self.flop_counts.keys():
                 if mod != 'Global':
                     table_data = []
-                    for k,v in self.flop_counts[mod].items():
+                    for k, v in self.flop_counts[mod].items():
                         mod_flops = round(v)
                         table_data.append([str(k), f"{mod_flops:,} FLOPs"])
                     flops_total = round(sum(self.flop_counts[mod].values()))
                     table_data.append(["TOTAL", f"{flops_total:,} FLOPs"])
                     table_headers = [mod, "FLOPs"]
-                    print(tabulate(table_data, table_headers, stralign="right", colalign=("center", "center")))
+                    print(tabulate(table_data, table_headers, stralign="right", colalign=("right", "right")))
                     print()
+
+        super().__exit__(*args)
 
     def __torch_dispatch__(self, func, types, args=(), kwargs=None):
         kwargs = kwargs if kwargs else {}

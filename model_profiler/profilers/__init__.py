@@ -1,4 +1,4 @@
-from model_profiler.profilers.memory_profiler import profile_memory_cost
-from model_profiler.profilers.flops_profiler import FlopCounterMode
+from model_profiler.profilers.memory_tracker.mem_tracker import MemTracker
+from model_profiler.profilers.flops_counter.flop_counter import FlopCounterMode
 
-__all__ = ["FlopCounterMode", "profile_memory_cost"]
+__all__ = ["FlopCounterMode", "MemTracker"]
